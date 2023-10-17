@@ -28,7 +28,7 @@ public class CreateMMPComponent extends AnAction {
 
         // index.ts
         String tsFile = virtualFilePath + "/index.ts";
-        String tsContent = "import { NewComponent } from '~/utils/main'\n" +
+        String tsContent = "import { NewComponent } from '@bike/utils'\n" +
                 "import { Data } from './types'\n" +
                 "\n" +
                 "const data: Data = {}\n" +

@@ -20,19 +20,22 @@ public class CreateMMPPage extends AnAction {
         VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
 
         String virtualFilePath = virtualFile.getPath();
+        String virtualFileName = virtualFile.getName();
         System.out.println(virtualFilePath);
+        System.out.println(virtualFileName);
 
         // index.ts
         String tsFile = virtualFilePath + "/index.ts";
-        String tsContent = "import { NewPage } from '~/utils/main'\n" +
+        String tsContent = "import { NewPage } from '@bike/utils'\n" +
                 "import pageBack from '~/behaviors/page-back'\n" +
                 "import { StoreAndBehavior, Data } from './types'\n" +
+                "import { Toast } from '@mola/toast/toast'\n" +
                 "\n" +
                 "class Index extends StoreAndBehavior {\n" +
                 "  /**\n" +
-                "   * 页面唯一标识，需要手动修改\n" +
+                "   * 页面唯一标识\n" +
                 "   */\n" +
-                "  name = 'index'\n" +
+                "  name = '" + virtualFileName + "'\n" +
                 "  behaviors = [pageBack]\n" +
                 "  /**\n" +
                 "   * 页面的初始数据\n" +
@@ -50,7 +53,7 @@ public class CreateMMPPage extends AnAction {
                 "  onShow() { }\n" +
                 "}\n" +
                 "\n" +
-                "NewPage(new Index())";
+                "NewPage(new Index())\n";
         try {
             Files.write(Paths.get(tsFile), tsContent.getBytes());
         } catch (IOException ex) {
@@ -74,7 +77,10 @@ public class CreateMMPPage extends AnAction {
         String jsonFile = virtualFilePath + "/index.json";
         String jsonContent = "{\n" +
                 "  \"navigationStyle\": \"custom\",\n" +
-                "  \"usingComponents\": {},\n" +
+                "  \"usingComponents\": {\n" +
+                "    \"mola-navigation-bar\": \"@mola/navigation-bar/index\",\n" +
+                "    \"mola-toast\": \"@mola/toast/index\"\n" +
+                "  },\n" +
                 "  \"hideCapsuleButtons\": true\n" +
                 "}";
         try {
@@ -86,7 +92,7 @@ public class CreateMMPPage extends AnAction {
         String lessFile = virtualFilePath + "/index.less";
         String lessContent = "/*use-double-px*/\n" +
                 "@import '@client/styles/index.less';\n" +
-                "page {\n" +
+                "." + virtualFileName + "-wrap {\n" +
                 "  .bg-main();\n" +
                 "  \n" +
                 "  min-height: 100%;\n" +
@@ -98,16 +104,17 @@ public class CreateMMPPage extends AnAction {
             throw new RuntimeException(ex);
         }
         String wxmlFile = virtualFilePath + "/index.wxml";
-        String wxmlContent = "<view>\n" +
-                "    <mola-navigation-bar\n" +
-                "      safeAreaInsetTop=\"{{true}}\"\n" +
-                "      fixed=\"{{true}}\"\n" +
-                "      placeholder=\"{{true}}\"\n" +
-                "      zIndex=\"{{2}}\"\n" +
-                "      title=\"标题\"\n" +
-                "      bind:click-left=\"onClickBack\"\n" +
-                "    />\n" +
-                "</view>";
+        String wxmlContent = "<view class=\"" + virtualFileName + "-wrap\">\n" +
+                "  <mola-navigation-bar\n" +
+                "    safeAreaInsetTop=\"{{true}}\"\n" +
+                "    fixed=\"{{true}}\"\n" +
+                "    placeholder=\"{{true}}\"\n" +
+                "    zIndex=\"{{24}}\"\n" +
+                "    title=\"标题\"\n" +
+                "    bind:click-left=\"onClickBack\"\n" +
+                "  />\n" +
+                "</view>\n" +
+                "<mola-toast id=\"toast\" />";
         try {
             Files.write(Paths.get(wxmlFile), wxmlContent.getBytes());
         } catch (IOException ex) {
