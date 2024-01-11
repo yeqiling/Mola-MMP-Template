@@ -58,6 +58,7 @@ public class CreateMMPComponent extends AnAction {
         }
 
 
+        // index.json
         String jsonFile = virtualFilePath + "/index.json";
         String jsonContent = "{\n" +
                 "  \"component\": true,\n" +
@@ -69,6 +70,7 @@ public class CreateMMPComponent extends AnAction {
             throw new RuntimeException(ex);
         }
 
+        // index.less
         String lessFile = virtualFilePath + "/index.less";
         String lessContent = "/*use-double-px*/";
         try {
@@ -76,6 +78,8 @@ public class CreateMMPComponent extends AnAction {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+
+        // index.wxml
         String wxmlFile = virtualFilePath + "/index.wxml";
         String wxmlContent = "<view></view>";
         try {

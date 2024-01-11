@@ -26,8 +26,7 @@ public class CreateMMPPage extends AnAction {
 
         // index.ts
         String tsFile = virtualFilePath + "/index.ts";
-        String tsContent = "import { NewPage } from '@bike/utils'\n" +
-                "import pageBack from '~/behaviors/page-back'\n" +
+        String tsContent = "import { NewPage, pageBack } from '@bike/utils\n" +
                 "import { StoreAndBehavior, Data } from './types'\n" +
                 "import { Toast } from '@mola/toast/toast'\n" +
                 "\n" +
@@ -36,7 +35,6 @@ public class CreateMMPPage extends AnAction {
                 "   * 页面唯一标识\n" +
                 "   */\n" +
                 "  name = '" + virtualFileName + "'\n" +
-                "  behaviors = [pageBack]\n" +
                 "  /**\n" +
                 "   * 页面的初始数据\n" +
                 "   */\n" +
@@ -45,12 +43,19 @@ public class CreateMMPPage extends AnAction {
                 "  /**\n" +
                 "   * 生命周期函数--监听页面加载\n" +
                 "   */\n" +
-                "  onLoad() { }\n" +
+                "  onLoad(options: Record<string, string>) { }\n" +
                 "\n" +
                 "  /**\n" +
                 "   * 生命周期函数--监听页面显示\n" +
                 "   */\n" +
                 "  onShow() { }\n" +
+                "\n" +
+                "  /**\n" +
+                "   * 返回上一级页面响应事件\n" +
+                "   */\n" +
+                "  onClickBack() {\n" +
+                "    pageBack()\n" +
+                "  }\n" +
                 "}\n" +
                 "\n" +
                 "NewPage(new Index())\n";
@@ -91,12 +96,9 @@ public class CreateMMPPage extends AnAction {
 
         String lessFile = virtualFilePath + "/index.less";
         String lessContent = "/*use-double-px*/\n" +
-                "@import '@client/styles/index.less';\n" +
+                "@import (reference) '@npm/common-style/index.less';\n" +
                 "." + virtualFileName + "-wrap {\n" +
-                "  .bg-main();\n" +
-                "  \n" +
-                "  min-height: 100%;\n" +
-                "  box-sizing: border-box;\n" +
+                "  .wrap-bg()\n" +
                 "}";
         try {
             Files.write(Paths.get(lessFile), lessContent.getBytes());
@@ -109,7 +111,7 @@ public class CreateMMPPage extends AnAction {
                 "    safeAreaInsetTop=\"{{true}}\"\n" +
                 "    fixed=\"{{true}}\"\n" +
                 "    placeholder=\"{{true}}\"\n" +
-                "    zIndex=\"{{24}}\"\n" +
+                "    zIndex=\"{{6}}\"\n" +
                 "    title=\"标题\"\n" +
                 "    bind:click-left=\"onClickBack\"\n" +
                 "  />\n" +
