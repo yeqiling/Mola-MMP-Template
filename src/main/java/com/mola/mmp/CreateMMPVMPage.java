@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class CreateMMPPage extends AnAction {
+public class CreateMMPVMPage extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -26,58 +26,104 @@ public class CreateMMPPage extends AnAction {
 
         // index.ts
         String tsFile = virtualFilePath + "/index.ts";
-        String tsContent = "import { NewPage, pageBack } from '@bike/utils\n" +
-                "import { StoreAndBehavior, Data } from './types'\n" +
-                "import { Toast } from '@mola/toast/toast'\n" +
+        String tsContent = "import { BaseView } from '@bike/mp-architecture'\n" +
+                "import { Connect } from '@bike/mp-architecture-impl'\n" +
                 "\n" +
-                "class Index extends StoreAndBehavior {\n" +
+                "import { router } from '~/utils/router/router'\n" +
+                "\n" +
+                "import VM from './view-model'\n" +
+                "\n" +
+                "class Index extends BaseView {" +
                 "  /**\n" +
                 "   * 页面唯一标识\n" +
                 "   */\n" +
                 "  name = '" + virtualFileName + "'\n" +
                 "  /**\n" +
-                "   * 页面的初始数据\n" +
+                "   * 页面的模型数据\n" +
                 "   */\n" +
-                "  data: Data = {}\n" +
+                "  vm = new VM()" +
                 "\n" +
-                "  /**\n" +
+                "   /**\n" +
                 "   * 生命周期函数--监听页面加载\n" +
                 "   */\n" +
-                "  onLoad(options: Record<string, string>) { }\n" +
+                "  onLoad(options: Record<string, string>) {\n" +
+                "    this.vm.onLoad(options)\n" +
+                "  }\n" +
                 "\n" +
-                "  /**\n" +
-                "   * 生命周期函数--监听页面显示\n" +
-                "   */\n" +
-                "  onShow() { }\n" +
-                "\n" +
-                "  /**\n" +
-                "   * 返回上一级页面响应事件\n" +
-                "   */\n" +
                 "  onClickBack() {\n" +
-                "    pageBack()\n" +
+                "    router.pageBackOrNative()\n" +
+                "  }\n" +
+                "  onUnload() {\n" +
+                "    this.vm.onUnload()\n" +
                 "  }\n" +
                 "}\n" +
                 "\n" +
-                "NewPage(new Index())\n";
+                "Connect(new Index(), VM)\n";
         try {
             Files.write(Paths.get(tsFile), tsContent.getBytes());
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
-        // types.ts
-        String typeFile = virtualFilePath + "/types.ts";
-        String typeContent = "import { BasicPage } from '~/typings/basic'\n" +
+        // ui-state.ts
+        String uiStateFile = virtualFilePath + "/ui-state.ts";
+        String uiStateContent = "import { BaseUiData } from '@bike/mp-architecture'\n" +
+                "import { makeAutoObservable } from 'mobx'\n" +
                 "\n" +
-                "export interface Data {}\n" +
                 "\n" +
-                "export class StoreAndBehavior extends BasicPage<Data> { }";
+                "export default class UIState implements BaseUiData {\n" +
+                "\n" +
+                "  constructor() {\n" +
+                "    makeAutoObservable(this)\n" +
+                "  }\n" +
+                "\n" +
+                "}";
         try {
-            Files.write(Paths.get(typeFile), typeContent.getBytes());
+            Files.write(Paths.get(uiStateFile), uiStateContent.getBytes());
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
 
+        // view-model.ts
+        String viewModelFile = virtualFilePath + "/view-model.ts";
+        String viewModelContent = "import { bindUIState, BaseModel } from '@bike/mp-architecture'\n" +
+                "import { ViewModelImpl } from '@bike/mp-architecture-impl'\n" +
+                "\n" +
+                "import UIState from './ui-state'\n" +
+                "\n" +
+                "export default class indexVM extends ViewModelImpl<UIState> {\n" +
+                "\n" +
+                "  uiState: UIState\n" +
+                "\n" +
+                "  constructor() {\n" +
+                "    super()\n" +
+                "    this.createModel()\n" +
+                "    this.uiState = new UIState()\n" +
+                "  }\n" +
+                "\n" +
+                "  createModel(): BaseModel[] {\n" +
+                "    return []\n" +
+                "  }\n" +
+                "\n" +
+                "  createDataBinding(baseView) {\n" +
+                "    // 绑定页面 baseView 是 Page/Component this\n" +
+                "    return bindUIState<UIState>(baseView, {\n" +
+                "      uiState: this.uiState,\n" +
+                "      deepBind: false\n" +
+                "    })\n" +
+                "  }\n" +
+                "\n" +
+                "  onLoad(options) {\n" +
+                "\n" +
+                "  }\n" +
+                "\n" +
+                "  onUnload() {}\n" +
+                "}\n";
+        try {
+            Files.write(Paths.get(viewModelFile), viewModelContent.getBytes());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
         String jsonFile = virtualFilePath + "/index.json";
         String jsonContent = "{\n" +
@@ -98,7 +144,7 @@ public class CreateMMPPage extends AnAction {
         String lessContent = "/*use-double-px*/\n" +
                 "@import (reference) '@npm/common-style/index.less';\n" +
                 "." + virtualFileName + "-wrap {\n" +
-                "  .wrap-bg()\n" +
+                "  .mp-wrap-bg()\n" +
                 "}";
         try {
             Files.write(Paths.get(lessFile), lessContent.getBytes());
@@ -125,7 +171,7 @@ public class CreateMMPPage extends AnAction {
 
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("Mola MMP Notification")
-                .createNotification("mmp page 模版已生成", NotificationType.INFORMATION)
+                .createNotification("mmp page viewModel模版已生成", NotificationType.INFORMATION)
                 .notify(project);
     }
 }

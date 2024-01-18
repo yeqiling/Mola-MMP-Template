@@ -14,9 +14,18 @@
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
-  ]]></description>
+    <p>This plugin allows you to generate MMP files with ease. Simply right-click on a folder and choose either CreateMMPVMPage or CreateMMPVMComponent to generate the necessary files for your MMP project.</p>
+    <h4>Benefits:</h4>
+    <ul>
+        <li>Saves time by automating the file creation process</li>
+        <li>Generates all necessary files for MMP pages and components</li>
+        <li>Easy to use with just a right-click on a folder</li>
+    </ul>
+    <h4>Keywords:</h4>
+    <p>MMP, file generator, page, component, automation, productivity.</p>
+    <p>For more information visit the <a href="https://example.com">project site</a>.</p>
+    ]]>
+    </description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
@@ -30,12 +39,19 @@
     </extensions>
 
     <actions>
-        <action popup="true" id="com.mola.mmp.action.CreateMMPPage" class="com.mola.mmp.CreateMMPPage" text="CreateMMPPage"
-                description="生成MMP-Page页面">
+        <action popup="true" id="com.mola.mmp.action.CreateMMPVMPage" class="com.mola.mmp.CreateMMPVMPage"
+                text="生成MMP-VMPage页面"
+                description="生成MMP-VMPage页面">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="WeighingNewGroup"/>
         </action>
-        <action popup="true" id="com.mola.mmp.action.CreateMMPComponent" class="com.mola.mmp.CreateMMPComponent" text="CreateMMPComponent"
-                description="创建MMP-Component">
+        <action popup="true" id="com.mola.mmp.action.CreateMMPVMComponent" class="com.mola.mmp.CreateMMPVMComponent"
+                text="生成MMP-VMComponent组件"
+                description="生成MMP-VMComponent组件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="WeighingNewGroup"/>
+        </action>
+        <action popup="true" id="com.mola.mmp.action.CreateMMPComponent" class="com.mola.mmp.CreateMMPComponent"
+                text="生成MMP-普通Component组件"
+                description="生成MMP-普通Component组件">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="WeighingNewGroup"/>
         </action>
     </actions>
