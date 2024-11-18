@@ -48,12 +48,13 @@ public class CreateMMPVMComponent extends AnAction {
                 "      this.data._vm.onUnload()\n" +
                 "    },\n" +
                 "    methods: {\n" +
+                "      onClick(e: WechatMiniprogram.CustomEvent) {\n" +
                 "\n" +
+                "      }\n" +
                 "    }\n" +
                 "  },\n" +
                 "  VM\n" +
-                ")\n" +
-                "\n";
+                ")\n";
         try {
             Files.write(Paths.get(tsFile), tsContent.getBytes());
         } catch (IOException ex) {
@@ -67,11 +68,9 @@ public class CreateMMPVMComponent extends AnAction {
                 "\n" +
                 "\n" +
                 "export default class UIState implements BaseUiData {\n" +
-                "\n" +
                 "  constructor() {\n" +
                 "    makeAutoObservable(this)\n" +
                 "  }\n" +
-                "\n" +
                 "}";
         try {
             Files.write(Paths.get(uiStateFile), uiStateContent.getBytes());
@@ -87,9 +86,7 @@ public class CreateMMPVMComponent extends AnAction {
                 "import UIState from './ui-state'\n" +
                 "\n" +
                 "export default class indexVM extends ViewModelImpl<UIState> {\n" +
-                "\n" +
                 "  uiState: UIState\n" +
-                "\n" +
                 "  triggerEvent: (\n" +
                 "    name: string,\n" +
                 "    detail?: any,\n" +
@@ -111,15 +108,15 @@ public class CreateMMPVMComponent extends AnAction {
                 "    // 绑定页面 baseView 是 Page/Component this\n" +
                 "    return bindUIState(view, {\n" +
                 "      uiState: this.uiState,\n" +
-                "      deepBind: true\n" +
+                "      deepBind: false\n" +
                 "    })\n" +
                 "  }\n" +
                 "\n" +
-                "  onLoad(options) {\n" +
+                "  onLoad() {\n" +
                 "  }\n" +
                 "\n" +
                 "  onUnload() {}\n" +
-                "}\n";
+                "}";
         try {
             Files.write(Paths.get(viewModelFile), viewModelContent.getBytes());
         } catch (IOException ex) {
@@ -141,7 +138,8 @@ public class CreateMMPVMComponent extends AnAction {
 
         // index.less
         String lessFile = virtualFilePath + "/index.less";
-        String lessContent = "/*use-double-px*/";
+        String lessContent = "/* use-double-px */\n" +
+                "@import (reference) '@npm/common-style/index.less';\n";
         try {
             Files.write(Paths.get(lessFile), lessContent.getBytes());
         } catch (IOException ex) {

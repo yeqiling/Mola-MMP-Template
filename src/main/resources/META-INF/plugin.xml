@@ -8,7 +8,9 @@
     <name>Mola-MMP-Template</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="fqzhanghao@163.com"
+            url="https://github.com/yeqiling/Mola-MMP-Template">Zhang Hao
+    </vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
@@ -39,6 +41,11 @@
     </extensions>
 
     <actions>
+        <action popup="true" id="com.mola.mmp.action.CreateMMPComponent" class="com.mola.mmp.CreateMMPComponent"
+                text="生成MMP-普通Component组件"
+                description="生成MMP-普通Component组件">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="WeighingNewGroup"/>
+        </action>
         <action popup="true" id="com.mola.mmp.action.CreateMMPVMPage" class="com.mola.mmp.CreateMMPVMPage"
                 text="生成MMP-VMPage页面"
                 description="生成MMP-VMPage页面">
@@ -49,9 +56,9 @@
                 description="生成MMP-VMComponent组件">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="WeighingNewGroup"/>
         </action>
-        <action popup="true" id="com.mola.mmp.action.CreateMMPComponent" class="com.mola.mmp.CreateMMPComponent"
-                text="生成MMP-普通Component组件"
-                description="生成MMP-普通Component组件">
+        <action popup="true" id="com.mola.mmp.action.CreateMMPScanPage" class="com.mola.mmp.CreateMMPScanPage"
+                text="生成MMP-Scan页面"
+                description="生成MMP-Scan页面">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="WeighingNewGroup"/>
         </action>
     </actions>

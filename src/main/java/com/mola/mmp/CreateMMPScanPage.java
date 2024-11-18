@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class CreateMMPVMPage extends AnAction {
+public class CreateMMPScanPage extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -26,32 +26,62 @@ public class CreateMMPVMPage extends AnAction {
 
         // index.ts
         String tsFile = virtualFilePath + "/index.ts";
-        String tsContent = "import { BaseView } from '@bike/mp-architecture'\n" +
-                "import { Connect } from '@bike/mp-architecture-impl'\n" +
+        String tsContent = "import { Connect, BaseWidget } from '@bike/mp-architecture-impl'\n" +
+                "import Widget, { ActionType } from '@bike/mp-widget'\n" +
+                "import { selfOrEmpty } from '@bike/utils'\n" +
+                "import { Toast } from '@mola/toast/toast'\n" +
                 "\n" +
                 "import { router } from '~/utils/router/router'\n" +
                 "\n" +
                 "import VM from './view-model'\n" +
                 "\n" +
-                "class Index extends BaseView {\n" +
+                "class Index extends BaseWidget {\n" +
                 "  name = '" + virtualFileName + "'\n" +
                 "  vm = new VM()\n" +
+                "  bizCode = ''\n" +
+                "  warehouseCode = ''\n" +
+                "  bikeId = ''\n" +
                 "  /**\n" +
                 "   * 生命周期函数--监听页面加载\n" +
                 "   */\n" +
                 "  onLoad(options: Record<string, string>) {\n" +
+                "    this.warehouseCode = options.warehouseCode\n" +
+                "    this.bikeId = selfOrEmpty(options.bikeId)\n" +
                 "    this.vm.onLoad(options)\n" +
+                "\n" +
+                "    Toast.text('测试toast').duration(3000).show()\n" +
                 "  }\n" +
                 "\n" +
-                "  onClickBack() {\n" +
-                "    router.pageBackOrNative()\n" +
+                "  onComplete() {\n" +
+                "    console.log('onComplete')\n" +
+                "    // 返回给上一页面结果\n" +
+                "    this.onBack()\n" +
+                "  }\n" +
+                "\n" +
+                "  onAction(e: WechatMiniprogram.CustomEvent) {\n" +
+                "    const { type } = e?.detail || {}\n" +
+                "    if (type === ActionType.TYPE_INPUT) {\n" +
+                "      this.navigateToUrlForResult(\n" +
+                "        'mola://mmp.mola-mmp/npm/common-page/common-input/index?type=bike_id'\n" +
+                "      )\n" +
+                "    }\n" +
+                "  }\n" +
+                "\n" +
+                "  onReceiveResult(defaultResult, exchangeBikeIdResult) {\n" +
+                "    const { data = '' } = exchangeBikeIdResult\n" +
+                "    if (data) {}\n" +
+                "  }\n" +
+                "\n" +
+                "  onScan(defaultResult, exchangeBikeIdResult) {\n" +
+                "    const { data } = exchangeBikeIdResult\n" +
+                "    if (data) {}\n" +
                 "  }\n" +
                 "  onUnload() {\n" +
                 "    this.vm.onUnload()\n" +
                 "  }\n" +
                 "}\n" +
                 "\n" +
-                "Connect(new Index(), VM)";
+                "Connect(new Index(), VM, Widget.scanWidget)";
         try {
             Files.write(Paths.get(tsFile), tsContent.getBytes());
         } catch (IOException ex) {
@@ -61,11 +91,21 @@ public class CreateMMPVMPage extends AnAction {
         // ui-state.ts
         String uiStateFile = virtualFilePath + "/ui-state.ts";
         String uiStateContent = "import { BaseUiData } from '@bike/mp-architecture'\n" +
+                "import { ActionType, NoticeStatus } from '@bike/mp-widget'\n" +
                 "import { makeAutoObservable } from 'mobx'\n" +
                 "\n" +
-                "\n" +
                 "export default class UIState implements BaseUiData {\n" +
-                "\n" +
+                "  title = '扫码'\n" +
+                "  showNotice = true\n" +
+                "  noticeContent = '请扫车码'\n" +
+                "  noticeStatus = NoticeStatus.NORMAL\n" +
+                "  actionList = [\n" +
+                "    { name: '输入设备编号', type: ActionType.TYPE_INPUT, url: '/qcloud/btn_scan_input.png' },\n" +
+                "    { name: '打开手电筒', type: ActionType.TYPE_TORCH, url: '/qcloud/btn_scan_torch.png' }\n" +
+                "  ]\n" +
+                "  disableScanCodeRequest = false\n" +
+                "  disableInputCodeRequest = false\n" +
+                "  rightList = []\n" +
                 "  constructor() {\n" +
                 "    makeAutoObservable(this)\n" +
                 "  }\n" +
@@ -103,9 +143,7 @@ public class CreateMMPVMPage extends AnAction {
                 "    })\n" +
                 "  }\n" +
                 "\n" +
-                "  onLoad(options) {\n" +
-                "\n" +
-                "  }\n" +
+                "  onLoad(options) {}\n" +
                 "\n" +
                 "  onUnload() {}\n" +
                 "}";
@@ -118,11 +156,11 @@ public class CreateMMPVMPage extends AnAction {
         String jsonFile = virtualFilePath + "/index.json";
         String jsonContent = "{\n" +
                 "  \"navigationStyle\": \"custom\",\n" +
+                "  \"widgetBackgroundColor\": \"#00000000\",\n" +
                 "  \"usingComponents\": {\n" +
-                "    \"mola-navigation-bar\": \"@mola/navigation-bar/index\",\n" +
+                "    \"mola-scan\": \"@mola/scan/index\",\n" +
                 "    \"mola-toast\": \"@mola/toast/index\"\n" +
-                "  },\n" +
-                "  \"hideCapsuleButtons\": true\n" +
+                "  }\n" +
                 "}";
         try {
             Files.write(Paths.get(jsonFile), jsonContent.getBytes());
@@ -133,8 +171,16 @@ public class CreateMMPVMPage extends AnAction {
         String lessFile = virtualFilePath + "/index.less";
         String lessContent = "/* use-double-px */\n" +
                 "@import (reference) '@npm/common-style/index.less';\n" +
-                "." + virtualFileName + "-wrap {\n" +
-                "  .mp-wrap-bg()\n" +
+                "page {\n" +
+                "  height: 100%;\n" +
+                "  background-color: transparent;\n" +
+                "}\n" +
+                ".container {\n" +
+                "  display: flex;\n" +
+                "  flex-direction: column;\n" +
+                "  width: 100%;\n" +
+                "  height: 100%;\n" +
+                "  background-color: transparent;\n" +
                 "}";
         try {
             Files.write(Paths.get(lessFile), lessContent.getBytes());
@@ -142,15 +188,19 @@ public class CreateMMPVMPage extends AnAction {
             throw new RuntimeException(ex);
         }
         String wxmlFile = virtualFilePath + "/index.wxml";
-        String wxmlContent = "<view class=\"" + virtualFileName + "-wrap\">\n" +
-                "  <mola-navigation-bar\n" +
-                "    safeAreaInsetTop=\"{{true}}\"\n" +
-                "    fixed=\"{{true}}\"\n" +
-                "    placeholder=\"{{true}}\"\n" +
-                "    title=\"标题\"\n" +
-                "    bind:click-left=\"onClickBack\"\n" +
-                "  />\n" +
-                "</view>\n" +
+        String wxmlContent = "<mola-scan\n" +
+                "  class=\"container\"\n" +
+                "  title=\"{{title}}\"\n" +
+                "  showNotice=\"{{showNotice}}\"\n" +
+                "  noticeStatus=\"{{noticeStatus}}\"\n" +
+                "  noticeContent=\"{{noticeContent}}\"\n" +
+                "  actionList=\"{{actionList}}\"\n" +
+                "  catch:back=\"onBack\"\n" +
+                "  catch:complete=\"onComplete\"\n" +
+                "  catch:action=\"onAction\"\n" +
+                "  rightList=\"{{rightList}}\"\n" +
+                "/>\n" +
+                "\n" +
                 "<mola-toast id=\"toast\" />";
         try {
             Files.write(Paths.get(wxmlFile), wxmlContent.getBytes());
@@ -160,7 +210,7 @@ public class CreateMMPVMPage extends AnAction {
 
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("Mola MMP Notification")
-                .createNotification("mmp page viewModel模版已生成", NotificationType.INFORMATION)
+                .createNotification("mmp scan 页面模版已生成", NotificationType.INFORMATION)
                 .notify(project);
     }
 }
